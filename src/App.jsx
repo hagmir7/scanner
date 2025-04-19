@@ -1,11 +1,10 @@
 import { useState } from 'react'
 import './App.css'
-import { Scanner } from '@yudiel/react-qr-scanner';
-
+import { Scanner } from '@yudiel/react-qr-scanner'
 
 const App = () => {
   const [scan, setScan] = useState(false)
-  const [result, setResult] = useState(null)
+  const [result, setResult] = useState([])
   const [error, setError] = useState(null)
 
   const handleScan = (data) => {
@@ -32,9 +31,13 @@ const App = () => {
       }
 
       if (scanResult && scanResult !== 'undefined') {
-        setResult(JSON.parse(scanResult))
-        console.log(JSON.parse(scanResult))
+        JSON.parse(scanResult).map((item)=>{
+          setResult((prev) => [...prev, item.rawValue])
+        })
         
+
+        console.log(JSON.parse(scanResult))
+
         // setResult(data)
         // setScan(false)
         // console.log('Processed scan result:', scanResult)
