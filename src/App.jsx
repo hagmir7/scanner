@@ -17,7 +17,7 @@ const App = () => {
 
       if (typeof data === 'object') {
         // Log all properties to help debug
-        console.log('Data properties:', Object.keys(data))
+        // console.log('Data properties:', Object.keys(data))
 
         // Try different possible property names
         scanResult =
@@ -69,7 +69,7 @@ const App = () => {
             onScan={handleScan}
             onError={handleError}
             onDecode={(data) => {
-              console.log('Decode data:', data)
+              // console.log('Decode data:', data)
               handleScan(data)
             }}
             constraints={{
@@ -90,7 +90,12 @@ const App = () => {
         <div className='result-container'>
           <h3>Scan Result:</h3>
           <div className='result-box'>
-            <p>{result}</p>
+            {
+              result.map(items =>{
+                  <p>{items.rowValue}</p>
+              })
+            }
+            
           </div>
           <button onClick={handleReset} className='reset-button'>
             Scan Again
