@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import './App.css'
-import { Scanner } from '@yudiel/react-qr-scanner'
+import { Scanner } from '@yudiel/react-qr-scanner';
+
 
 const App = () => {
   const [scan, setScan] = useState(false)
@@ -8,7 +9,7 @@ const App = () => {
   const [error, setError] = useState(null)
 
   const handleScan = (data) => {
-    console.log('Raw scan data:', data)
+    // console.log('Raw scan data:', data)
 
     // Only process the scan if we have meaningful data
     if (data) {
@@ -31,9 +32,12 @@ const App = () => {
       }
 
       if (scanResult && scanResult !== 'undefined') {
-        setResult(scanResult)
-        setScan(false)
-        console.log('Processed scan result:', scanResult)
+        setResult(JSON.parse(scanResult))
+        console.log(JSON.parse(scanResult))
+        
+        // setResult(data)
+        // setScan(false)
+        // console.log('Processed scan result:', scanResult)
       } else {
         console.warn(
           "Scan returned data but couldn't extract meaningful result"
@@ -66,6 +70,7 @@ const App = () => {
       {scan && (
         <div className='scanner-container'>
           <Scanner
+            allowMultiple={true}
             onScan={handleScan}
             onError={handleError}
             onDecode={(data) => {
@@ -90,12 +95,10 @@ const App = () => {
         <div className='result-container'>
           <h3>Scan Result:</h3>
           <div className='result-box'>
-            {
-              result.map(items =>{
-                  <p>{items.rowValue}</p>
-              })
-            }
-            
+            {/* {JSON.stringify(result)} */}
+            {result.map((item, index) => {
+              return <p key={index}>{item.rawValue}</p>
+            })}
           </div>
           <button onClick={handleReset} className='reset-button'>
             Scan Again
