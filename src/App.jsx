@@ -4,22 +4,14 @@ import { Scanner } from '@yudiel/react-qr-scanner'
 
 const App = () => {
   const [scan, setScan] = useState(false)
-  const [result, setResult] = useState([])
+  const [result, setResult] = useState([]) // Always an array
   const [error, setError] = useState(null)
 
   const handleScan = (data) => {
-    // console.log('Raw scan data:', data)
-
-    // Only process the scan if we have meaningful data
     if (data) {
-      // Handle different possible data formats
       let scanResult
 
       if (typeof data === 'object') {
-        // Log all properties to help debug
-        // console.log('Data properties:', Object.keys(data))
-
-        // Try different possible property names
         scanResult =
           data.text ||
           data.data ||
@@ -31,16 +23,15 @@ const App = () => {
       }
 
       if (scanResult && scanResult !== 'undefined') {
-        JSON.parse(scanResult).map((item)=>{
-          setResult((prev) => [...prev, item.rawValue])
-        })
-        
-
-        console.log(JSON.parse(scanResult))
-
-        // setResult(data)
-        // setScan(false)
-        // console.log('Processed scan result:', scanResult)
+        try {
+          const parsedData = JSON.parse(scanResult)
+          const rawValues = parsedData.map((item) => item.rawValue)
+          setResult((prev) => [...prev, ...rawValues]) // append all values at once
+          console.log(parsedData)
+        } catch (e) {
+          console.error('Failed to parse JSON:', e)
+          setError('Invalid QR code format')
+        }
       } else {
         console.warn(
           "Scan returned data but couldn't extract meaningful result"
@@ -55,7 +46,7 @@ const App = () => {
   }
 
   const handleReset = () => {
-    setResult(null)
+    setResult([]) // ✅ should be empty array, not null
     setError(null)
     setScan(false)
   }
@@ -64,7 +55,7 @@ const App = () => {
     <div className='container'>
       <h2>QR Code Scanner</h2>
 
-      {!result && !error && (
+      {!result.length && !error && (
         <button onClick={() => setScan(!scan)} className='scan-button'>
           {scan ? 'Cancel Scan' : 'Start Scan'}
         </button>
@@ -76,10 +67,7 @@ const App = () => {
             allowMultiple={true}
             onScan={handleScan}
             onError={handleError}
-            onDecode={(data) => {
-              // console.log('Decode data:', data)
-              handleScan(data)
-            }}
+            onDecode={handleScan}
             constraints={{
               facingMode: 'environment',
             }}
@@ -94,14 +82,13 @@ const App = () => {
         </div>
       )}
 
-      {result && (
+      {result.length > 0 && (
         <div className='result-container'>
           <h3>Scan Result:</h3>
           <div className='result-box'>
-            {/* {JSON.stringify(result)} */}
-            {result.map((item, index) => {
-              return <p key={index}>{item.rawValue}</p>
-            })}
+            {result.map((item, index) => (
+              <p key={index}>{item}</p>
+            ))}
           </div>
           <button onClick={handleReset} className='reset-button'>
             Scan Again
